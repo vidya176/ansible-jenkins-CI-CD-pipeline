@@ -1,7 +1,5 @@
 sudo dnf update -y
-
 sudo dnf install ansible -y
-
 sudo dnf install python3 python3-pip -y
 # STEP-1: UPDATE THE SERVER
 sudo dnf update -y
