@@ -149,8 +149,6 @@ ansible-jenkins-cicd-pipeline
 
 ## 📸 Screenshots
 
-Screenshots will be added for:
-
 - Jenkins Dashboard
 - Blue Ocean Pipeline
 - Successful Build
