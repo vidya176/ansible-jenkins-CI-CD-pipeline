@@ -109,9 +109,6 @@ ansible-jenkins-cicd-pipeline
 ### Branch
 
 - main
-- master
-- release
-- hotfix
 
 ### Environment
 
@@ -183,17 +180,5 @@ Screenshots will be added for:
 
 - Dockerize the application
 - Deploy on Kubernetes
-- Integrate SonarQube
-- Add Trivy Image Scanning
 - Provision infrastructure using Terraform
 - Deploy on AWS
-
----
-
-## 👨‍💻 Author
-
-**Vidya Nandini**
-
-Aspiring DevOps & Cloud Engineer
-
-If you found this repository helpful, feel free to ⭐ the project.
