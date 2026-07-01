@@ -1,0 +1,125 @@
+pipeline {
+
+```
+agent any
+
+parameters {
+
+    choice(
+        name: 'SERVER',
+        choices: ['dev', 'test'],
+        description: 'Select deployment environment'
+    )
+
+    string(
+        name: 'BRANCH',
+        defaultValue: 'main',
+        description: 'Enter branch name (main/master/release/hotfix)'
+    )
+}
+
+stages {
+
+    stage('Checkout') {
+        steps {
+            echo 'Checking out source code from GitHub...'
+
+            git branch: "${params.BRANCH}",
+                url: 'https://github.com/devopsbyraham/jenkins-java-project.git'
+        }
+    }
+
+    stage('Build') {
+        steps {
+            echo 'Compiling application...'
+
+            sh 'mvn clean compile'
+        }
+    }
+
+    stage('Test') {
+        steps {
+            echo 'Running unit tests...'
+
+            sh 'mvn test'
+        }
+    }
+
+    stage('Package Artifact') {
+        steps {
+            echo 'Packaging WAR file...'
+
+            sh 'mvn package'
+        }
+    }
+
+    stage('Upload to Nexus') {
+        steps {
+
+            echo 'Uploading artifact to Nexus Repository...'
+
+            nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'http',
+                nexusUrl: '<NEXUS_SERVER_IP>:8081',
+                groupId: 'in.raham',
+                version: '1.2.2',
+                repository: '<REPOSITORY_NAME>',
+                credentialsId: 'nexus',
+                artifacts: [
+                    [
+                        artifactId: 'NETFLIX',
+                        classifier: '',
+                        file: 'target/NETFLIX-1.2.2.war',
+                        type: 'war'
+                    ]
+                ]
+            )
+        }
+    }
+
+    stage('Deployment Approval') {
+
+        steps {
+
+            input(
+                message: "Deploy application to ${params.SERVER} environment?",
+                ok: "Deploy"
+            )
+        }
+    }
+
+    stage('Deploy using Ansible') {
+
+        steps {
+
+            echo "Deploying application to ${params.SERVER} servers..."
+
+            ansiblePlaybook(
+                playbook: '/etc/ansible/playbook.yml',
+                inventory: '/etc/ansible/hosts',
+                credentialsId: 'ansible-ssh',
+                disableHostKeyChecking: true,
+                limit: "${params.SERVER}"
+            )
+        }
+    }
+}
+
+post {
+
+    success {
+        echo 'Pipeline executed successfully.'
+    }
+
+    failure {
+        echo 'Pipeline execution failed.'
+    }
+
+    always {
+        echo 'Pipeline execution completed.'
+    }
+}
+```
+
+}
